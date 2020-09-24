@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import { fork, ChildProcess } from "child_process";
 import path from "path";
 import WebSocket from "ws";
-import { worker } from "cluster";
 import { throttle } from "lodash";
 
 dotenv.config();
