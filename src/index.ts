@@ -50,17 +50,22 @@ class Server {
       this.socketThrottledSendFunc();
     });
 
-    child.on("close", (code) => {
-      console.log(`child process exited with code ${code}`);
-      this.makeWorker();
-    });
-
-    this.allWorkers.push({
+    const worker: Worker = {
       pid: child.pid,
       type: "worker",
       receivedCount: 0,
       processedCount: 0,
       instance: child,
+    };
+
+    this.allWorkers.push(worker);
+
+    child.on("close", (code) => {
+      console.log(`child process exited with code ${code}`);
+      if (worker.type == "master") {
+        this.makeMaster();
+      }
+      this.makeWorker();
     });
   }
 
@@ -94,9 +99,6 @@ class Server {
     const index = this.allWorkers.findIndex((worker) => worker.pid == pid);
     const currentWorker = this.allWorkers.splice(index, 1)[0];
     currentWorker.instance.kill();
-    if (currentWorker.type == "master") {
-      this.makeMaster();
-    }
   }
 
   socketInit() {
