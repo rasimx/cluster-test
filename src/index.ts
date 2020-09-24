@@ -43,9 +43,13 @@ class Server {
     const child = fork(__dirname + path.sep + "Child.js");
     child.on("message", (msg: Message) => {
       if (msg.action == "success") {
-        this.allWorkers.filter((worker) => worker.pid === msg.data)[0]
-          .processedCount++;
-        this.totalProcessed++;
+        try {
+          this.allWorkers.filter((worker) => worker.pid === msg.data)[0]
+            .processedCount++;
+          this.totalProcessed++;
+        } catch (err) {
+          console.log(err.message);
+        }
       }
       this.socketThrottledSendFunc();
     });
